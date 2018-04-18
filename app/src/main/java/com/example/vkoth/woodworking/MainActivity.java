@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity{
     ImageView imageView;
     Bitmap bitmap;
     Canvas canvas;
-    Paint paint,cpaint;
+    Paint paint,cpaint,rpaint;
     Path path;
 
     float woodworkingEnterance[] = {716,2490};
@@ -139,11 +139,29 @@ public class MainActivity extends AppCompatActivity{
        startPoint.setText(text);
      //   endPoint.setText("w9");
 
+        if(text.equals("woodworking entrance"))
+        {
+            canvas.drawCircle(woodworkingEnterance[0],woodworkingEnterance[1],10,rpaint);
+        }
+        else if(text.equals("student lounge entrance"))
+        {
+            canvas.drawCircle(studentloungeStart[0],studentloungeStart[1],10,rpaint);
+        }
+        else if(text.equals("student lounge"))
+        {
+            canvas.drawCircle(studentloungeMid[0],studentloungeMid[1],10,rpaint);
+        }
+        else if(text.equals("student lounge end"))
+        {
+            canvas.drawCircle(stdentloungeEnd[0],stdentloungeEnd[1],10,rpaint);
+        }
+
         bitmap = Bitmap.createBitmap((int) dw, (int) dh,
                 Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
         paint = new Paint();
         cpaint = new Paint();
+        rpaint = new Paint();
         path = new Path();
 
         paint.setAntiAlias(true);
@@ -158,11 +176,16 @@ public class MainActivity extends AppCompatActivity{
         cpaint.setStyle(Paint.Style.STROKE);
         cpaint.setStrokeWidth(20f);
 
+        rpaint.setAntiAlias(true);
+        rpaint.setColor(Color.BLUE);
+        rpaint.setStrokeJoin(Paint.Join.ROUND);
+        rpaint.setStyle(Paint.Style.STROKE);
+        rpaint.setStrokeWidth(20f);
+
+
         imageView.setImageBitmap(bitmap);
 
-        //canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w1[0], w1[1], paint); // line to w1
-       // canvas.drawLine(w1[0],w1[1],studentloungeStart[0],studentloungeStart[1],paint); // student lounge end to studentlounge start
-       // canvas.drawLine(studentloungeStart[0], studentloungeStart[1], woodworkingEnterance[0], woodworkingEnterance[1], paint); // line to w1
+        canvas.drawCircle(woodworkingEnterance[0],woodworkingEnterance[1],10,rpaint);
 
         showPath.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,7 +205,7 @@ public class MainActivity extends AppCompatActivity{
                     if(end.equals("w1")) {
                         canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
                         canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w1[0], w1[1], paint); // line to w1
-
+                      //  canvas.drawCircle(w1[0],w1[1],10,rpaint);
 
                         ProximityZone zone1 = proximityObserverw12.zoneBuilder()
                                 .forAttachmentKeyAndValue("floor", "8th")
@@ -202,6 +225,1184 @@ public class MainActivity extends AppCompatActivity{
                                         }
 
                                       //  tv.setText(data);
+                                        if(data.equals("woodworking entrance,"))
+                                        {
+                                            Toast.makeText(getApplicationContext(),"You are at woodworking entrance. Walk straight around 4 meters.",Toast.LENGTH_LONG).show();
+                                        }
+                                        if (data.equals("woodworking entrance,student lounge start,")  || data.equals("student lounge start,")) {
+                                            Toast.makeText(getApplicationContext(), "Take right and walk for around 15 meters", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        // Toast.makeText(getApplicationContext(),"devices"+desks,Toast.LENGTH_SHORT).show();
+                                        return null;
+                                    }
+                                })
+                                .create();
+                        proximityObserverw12.addProximityZone(zone1);
+
+
+
+                        ProximityZone zone3 =
+                                proximityObserverw12.zoneBuilder()
+                                        .forAttachmentKeyAndValue("location", "w12")
+                                        .inNearRange()
+                                        .withOnEnterAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                                                builder.setTitle("Destination Arrived");
+                                                builder.setMessage("You have reached your destination. It is on your right side");
+
+                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Intent i = new Intent(MainActivity.this,NavigationHome.class);
+                                                        startActivity(i);
+
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+
+
+
+                                                AlertDialog alert = builder.create();
+                                                alert.show();
+
+                                                //Toast.makeText(getApplicationContext(), "Your destination is on your right side", Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+                                                // Toast.makeText(getApplicationContext(),"bye to student lounge end",Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                            @Override
+                                            public Unit invoke(List<? extends ProximityAttachment> proximityAttachments) {
+
+                                                return null;
+                                            }
+                                        })
+                                        .create();
+
+
+                        proximityObserverw12.addProximityZone(zone3);
+
+
+                        RequirementsWizardFactory
+                                .createEstimoteRequirementsWizard()
+                                .fulfillRequirements(MainActivity.this,
+                                        // onRequirementsFulfilled
+                                        new Function0<Unit>() {
+                                            @Override public Unit invoke() {
+                                                Log.d("app", "requirements fulfilled");
+                                                proximityHandlerw12 = proximityObserverw12.start();
+                                                return null;
+                                            }
+                                        },
+                                        // onRequirementsMissing
+                                        new Function1<List<? extends Requirement>, Unit>() {
+                                            @Override public Unit invoke(List<? extends Requirement> requirements) {
+                                                Log.e("app", "requirements missing: " + requirements);
+                                                return null;
+                                            }
+                                        },
+                                        // onError
+                                        new Function1<Throwable, Unit>() {
+                                            @Override public Unit invoke(Throwable throwable) {
+                                                Log.e("app", "requirements error: " + throwable);
+                                                return null;
+                                            }
+                                        });
+                    }
+                    else if(end.equals("w2")) {
+                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
+                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w2[0], w2[1], paint); // line to w2
+
+                        ProximityZone zone1 = proximityObserverw12.zoneBuilder()
+                                .forAttachmentKeyAndValue("floor", "8th")
+                                .inCustomRange(2.5)
+                                .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                    @Override
+                                    public Unit invoke(List<? extends ProximityAttachment> attachments) {
+                                        List<String> desks = new ArrayList<>();
+                                        for (ProximityAttachment attachment : attachments) {
+                                            desks.add(attachment.getPayload().get("location"));
+                                        }
+                                        Log.d("app", "Nearby location: " + desks);
+                                        int count = desks.size();
+                                        String data = "";
+                                        for (int i = 0; i < count; i++) {
+                                            data = data + desks.get(i) + ",";
+                                        }
+
+                                        //  tv.setText(data);
+                                        if(data.equals("woodworking entrance,"))
+                                        {
+                                            Toast.makeText(getApplicationContext(),"You are at woodworking entrance. Walk straight around 4 meters.",Toast.LENGTH_LONG).show();
+                                        }
+                                        if (data.equals("woodworking entrance,student lounge start,")  || data.equals("student lounge start,")) {
+                                            Toast.makeText(getApplicationContext(), "Take right and walk for around 11 meters", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        // Toast.makeText(getApplicationContext(),"devices"+desks,Toast.LENGTH_SHORT).show();
+                                        return null;
+                                    }
+                                })
+                                .create();
+                        proximityObserverw12.addProximityZone(zone1);
+
+
+
+                        ProximityZone zone3 =
+                                proximityObserverw12.zoneBuilder()
+                                        .forAttachmentKeyAndValue("location", "w12")
+                                        .inNearRange()
+                                        .withOnEnterAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                                                builder.setTitle("Destination Arrived");
+                                                builder.setMessage("You have reached your destination. It is on your right side");
+
+                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Intent i = new Intent(MainActivity.this,NavigationHome.class);
+                                                        startActivity(i);
+
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+
+
+
+                                                AlertDialog alert = builder.create();
+                                                alert.show();
+
+                                                //Toast.makeText(getApplicationContext(), "Your destination is on your right side", Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+                                                // Toast.makeText(getApplicationContext(),"bye to student lounge end",Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                            @Override
+                                            public Unit invoke(List<? extends ProximityAttachment> proximityAttachments) {
+
+                                                return null;
+                                            }
+                                        })
+                                        .create();
+
+
+                        proximityObserverw12.addProximityZone(zone3);
+
+
+                        RequirementsWizardFactory
+                                .createEstimoteRequirementsWizard()
+                                .fulfillRequirements(MainActivity.this,
+                                        // onRequirementsFulfilled
+                                        new Function0<Unit>() {
+                                            @Override public Unit invoke() {
+                                                Log.d("app", "requirements fulfilled");
+                                                proximityHandlerw12 = proximityObserverw12.start();
+                                                return null;
+                                            }
+                                        },
+                                        // onRequirementsMissing
+                                        new Function1<List<? extends Requirement>, Unit>() {
+                                            @Override public Unit invoke(List<? extends Requirement> requirements) {
+                                                Log.e("app", "requirements missing: " + requirements);
+                                                return null;
+                                            }
+                                        },
+                                        // onError
+                                        new Function1<Throwable, Unit>() {
+                                            @Override public Unit invoke(Throwable throwable) {
+                                                Log.e("app", "requirements error: " + throwable);
+                                                return null;
+                                            }
+                                        });
+                    }
+                    else if(end.equals("w3")) {
+                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
+                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w3[0], w3[1], paint); // line to w3
+
+                        ProximityZone zone1 = proximityObserverw12.zoneBuilder()
+                                .forAttachmentKeyAndValue("floor", "8th")
+                                .inCustomRange(2.5)
+                                .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                    @Override
+                                    public Unit invoke(List<? extends ProximityAttachment> attachments) {
+                                        List<String> desks = new ArrayList<>();
+                                        for (ProximityAttachment attachment : attachments) {
+                                            desks.add(attachment.getPayload().get("location"));
+                                        }
+                                        Log.d("app", "Nearby location: " + desks);
+                                        int count = desks.size();
+                                        String data = "";
+                                        for (int i = 0; i < count; i++) {
+                                            data = data + desks.get(i) + ",";
+                                        }
+
+                                        //  tv.setText(data);
+                                        if(data.equals("woodworking entrance,"))
+                                        {
+                                            Toast.makeText(getApplicationContext(),"You are at woodworking entrance. Walk straight around 4 meters.",Toast.LENGTH_LONG).show();
+                                        }
+                                        if (data.equals("woodworking entrance,student lounge start,")  || data.equals("student lounge start,")) {
+                                            Toast.makeText(getApplicationContext(), "Take right and walk for around 5 meters", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        // Toast.makeText(getApplicationContext(),"devices"+desks,Toast.LENGTH_SHORT).show();
+                                        return null;
+                                    }
+                                })
+                                .create();
+                        proximityObserverw12.addProximityZone(zone1);
+
+
+
+                        ProximityZone zone3 =
+                                proximityObserverw12.zoneBuilder()
+                                        .forAttachmentKeyAndValue("location", "w12")
+                                        .inNearRange()
+                                        .withOnEnterAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                                                builder.setTitle("Destination Arrived");
+                                                builder.setMessage("You have reached your destination. It is on your right side");
+
+                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Intent i = new Intent(MainActivity.this,NavigationHome.class);
+                                                        startActivity(i);
+
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+
+
+
+                                                AlertDialog alert = builder.create();
+                                                alert.show();
+
+                                                //Toast.makeText(getApplicationContext(), "Your destination is on your right side", Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+                                                // Toast.makeText(getApplicationContext(),"bye to student lounge end",Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                            @Override
+                                            public Unit invoke(List<? extends ProximityAttachment> proximityAttachments) {
+
+                                                return null;
+                                            }
+                                        })
+                                        .create();
+
+
+                        proximityObserverw12.addProximityZone(zone3);
+
+
+                        RequirementsWizardFactory
+                                .createEstimoteRequirementsWizard()
+                                .fulfillRequirements(MainActivity.this,
+                                        // onRequirementsFulfilled
+                                        new Function0<Unit>() {
+                                            @Override public Unit invoke() {
+                                                Log.d("app", "requirements fulfilled");
+                                                proximityHandlerw12 = proximityObserverw12.start();
+                                                return null;
+                                            }
+                                        },
+                                        // onRequirementsMissing
+                                        new Function1<List<? extends Requirement>, Unit>() {
+                                            @Override public Unit invoke(List<? extends Requirement> requirements) {
+                                                Log.e("app", "requirements missing: " + requirements);
+                                                return null;
+                                            }
+                                        },
+                                        // onError
+                                        new Function1<Throwable, Unit>() {
+                                            @Override public Unit invoke(Throwable throwable) {
+                                                Log.e("app", "requirements error: " + throwable);
+                                                return null;
+                                            }
+                                        });
+                    }
+                    else if(end.equals("w9") || end.equals("w9/10"))
+                    {
+                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
+                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w9we[0], w9we[1], paint); // line to w9
+
+                        ProximityZone zone1 = proximityObserverw12.zoneBuilder()
+                                .forAttachmentKeyAndValue("floor", "8th")
+                                .inCustomRange(2.5)
+                                .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                    @Override
+                                    public Unit invoke(List<? extends ProximityAttachment> attachments) {
+                                        List<String> desks = new ArrayList<>();
+                                        for (ProximityAttachment attachment : attachments) {
+                                            desks.add(attachment.getPayload().get("location"));
+                                        }
+                                        Log.d("app", "Nearby location: " + desks);
+                                        int count = desks.size();
+                                        String data = "";
+                                        for (int i = 0; i < count; i++) {
+                                            data = data + desks.get(i) + ",";
+                                        }
+
+                                        //  tv.setText(data);
+                                        if(data.equals("woodworking entrance,"))
+                                        {
+                                            Toast.makeText(getApplicationContext(),"You are at woodworking entrance. Walk straight around 4 meters.",Toast.LENGTH_LONG).show();
+                                        }
+                                        if (data.equals("woodworking entrance,student lounge start,")  || data.equals("student lounge start,")) {
+                                            Toast.makeText(getApplicationContext(), "Take right and walk for around 5 meters", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        // Toast.makeText(getApplicationContext(),"devices"+desks,Toast.LENGTH_SHORT).show();
+                                        return null;
+                                    }
+                                })
+                                .create();
+                        proximityObserverw12.addProximityZone(zone1);
+
+
+
+                        ProximityZone zone3 =
+                                proximityObserverw12.zoneBuilder()
+                                        .forAttachmentKeyAndValue("location", "w12")
+                                        .inNearRange()
+                                        .withOnEnterAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                                                builder.setTitle("Destination Arrived");
+                                                builder.setMessage("You have reached your destination. It is on your left side");
+
+                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Intent i = new Intent(MainActivity.this,NavigationHome.class);
+                                                        startActivity(i);
+
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+
+
+
+                                                AlertDialog alert = builder.create();
+                                                alert.show();
+
+                                                //Toast.makeText(getApplicationContext(), "Your destination is on your right side", Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+                                                // Toast.makeText(getApplicationContext(),"bye to student lounge end",Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                            @Override
+                                            public Unit invoke(List<? extends ProximityAttachment> proximityAttachments) {
+
+                                                return null;
+                                            }
+                                        })
+                                        .create();
+
+
+                        proximityObserverw12.addProximityZone(zone3);
+
+
+                        RequirementsWizardFactory
+                                .createEstimoteRequirementsWizard()
+                                .fulfillRequirements(MainActivity.this,
+                                        // onRequirementsFulfilled
+                                        new Function0<Unit>() {
+                                            @Override public Unit invoke() {
+                                                Log.d("app", "requirements fulfilled");
+                                                proximityHandlerw12 = proximityObserverw12.start();
+                                                return null;
+                                            }
+                                        },
+                                        // onRequirementsMissing
+                                        new Function1<List<? extends Requirement>, Unit>() {
+                                            @Override public Unit invoke(List<? extends Requirement> requirements) {
+                                                Log.e("app", "requirements missing: " + requirements);
+                                                return null;
+                                            }
+                                        },
+                                        // onError
+                                        new Function1<Throwable, Unit>() {
+                                            @Override public Unit invoke(Throwable throwable) {
+                                                Log.e("app", "requirements error: " + throwable);
+                                                return null;
+                                            }
+                                        });
+                    }
+                    else if(end.equals("w10"))
+                    {
+                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
+                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w10we[0], w10we[1], paint); // line to w10
+
+                        ProximityZone zone1 = proximityObserverw12.zoneBuilder()
+                                .forAttachmentKeyAndValue("floor", "8th")
+                                .inCustomRange(2.5)
+                                .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                    @Override
+                                    public Unit invoke(List<? extends ProximityAttachment> attachments) {
+                                        List<String> desks = new ArrayList<>();
+                                        for (ProximityAttachment attachment : attachments) {
+                                            desks.add(attachment.getPayload().get("location"));
+                                        }
+                                        Log.d("app", "Nearby location: " + desks);
+                                        int count = desks.size();
+                                        String data = "";
+                                        for (int i = 0; i < count; i++) {
+                                            data = data + desks.get(i) + ",";
+                                        }
+
+                                        //  tv.setText(data);
+                                        if(data.equals("woodworking entrance,"))
+                                        {
+                                            Toast.makeText(getApplicationContext(),"You are at woodworking entrance. Walk straight around 4 meters.",Toast.LENGTH_LONG).show();
+                                        }
+                                        if (data.equals("woodworking entrance,student lounge start,")  || data.equals("student lounge start,")) {
+                                            Toast.makeText(getApplicationContext(), "Take right and walk for around 17 meters", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        // Toast.makeText(getApplicationContext(),"devices"+desks,Toast.LENGTH_SHORT).show();
+                                        return null;
+                                    }
+                                })
+                                .create();
+                        proximityObserverw12.addProximityZone(zone1);
+
+
+
+                        ProximityZone zone3 =
+                                proximityObserverw12.zoneBuilder()
+                                        .forAttachmentKeyAndValue("location", "w12")
+                                        .inNearRange()
+                                        .withOnEnterAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                                                builder.setTitle("Destination Arrived");
+                                                builder.setMessage("You have reached your destination. It is on your left side");
+
+                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Intent i = new Intent(MainActivity.this,NavigationHome.class);
+                                                        startActivity(i);
+
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+
+
+
+                                                AlertDialog alert = builder.create();
+                                                alert.show();
+
+                                                //Toast.makeText(getApplicationContext(), "Your destination is on your right side", Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+                                                // Toast.makeText(getApplicationContext(),"bye to student lounge end",Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                            @Override
+                                            public Unit invoke(List<? extends ProximityAttachment> proximityAttachments) {
+
+                                                return null;
+                                            }
+                                        })
+                                        .create();
+
+
+                        proximityObserverw12.addProximityZone(zone3);
+
+
+                        RequirementsWizardFactory
+                                .createEstimoteRequirementsWizard()
+                                .fulfillRequirements(MainActivity.this,
+                                        // onRequirementsFulfilled
+                                        new Function0<Unit>() {
+                                            @Override public Unit invoke() {
+                                                Log.d("app", "requirements fulfilled");
+                                                proximityHandlerw12 = proximityObserverw12.start();
+                                                return null;
+                                            }
+                                        },
+                                        // onRequirementsMissing
+                                        new Function1<List<? extends Requirement>, Unit>() {
+                                            @Override public Unit invoke(List<? extends Requirement> requirements) {
+                                                Log.e("app", "requirements missing: " + requirements);
+                                                return null;
+                                            }
+                                        },
+                                        // onError
+                                        new Function1<Throwable, Unit>() {
+                                            @Override public Unit invoke(Throwable throwable) {
+                                                Log.e("app", "requirements error: " + throwable);
+                                                return null;
+                                            }
+                                        });
+                    }
+                    else if(end.equals("w11"))
+                    {
+                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
+                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w11[0], w11[1], paint); // line to w11
+
+                        ProximityZone zone1 = proximityObserverw12.zoneBuilder()
+                                .forAttachmentKeyAndValue("floor", "8th")
+                                .inCustomRange(2.5)
+                                .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                    @Override
+                                    public Unit invoke(List<? extends ProximityAttachment> attachments) {
+                                        List<String> desks = new ArrayList<>();
+                                        for (ProximityAttachment attachment : attachments) {
+                                            desks.add(attachment.getPayload().get("location"));
+                                        }
+                                        Log.d("app", "Nearby location: " + desks);
+                                        int count = desks.size();
+                                        String data = "";
+                                        for (int i = 0; i < count; i++) {
+                                            data = data + desks.get(i) + ",";
+                                        }
+
+                                        //  tv.setText(data);
+                                        if(data.equals("woodworking entrance,"))
+                                        {
+                                            Toast.makeText(getApplicationContext(),"You are at woodworking entrance. Walk straight around 4 meters.",Toast.LENGTH_LONG).show();
+                                        }
+                                        if (data.equals("woodworking entrance,student lounge start,")  || data.equals("student lounge start,")) {
+                                            Toast.makeText(getApplicationContext(), "Take right and walk for around 20 meters", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        // Toast.makeText(getApplicationContext(),"devices"+desks,Toast.LENGTH_SHORT).show();
+                                        return null;
+                                    }
+                                })
+                                .create();
+                        proximityObserverw12.addProximityZone(zone1);
+
+
+
+                        ProximityZone zone3 =
+                                proximityObserverw12.zoneBuilder()
+                                        .forAttachmentKeyAndValue("location", "w12")
+                                        .inNearRange()
+                                        .withOnEnterAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                                                builder.setTitle("Destination Arrived");
+                                                builder.setMessage("You have reached your destination. It is on your left side");
+
+                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Intent i = new Intent(MainActivity.this,NavigationHome.class);
+                                                        startActivity(i);
+
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+
+
+
+                                                AlertDialog alert = builder.create();
+                                                alert.show();
+
+                                                //Toast.makeText(getApplicationContext(), "Your destination is on your right side", Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+                                                // Toast.makeText(getApplicationContext(),"bye to student lounge end",Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                            @Override
+                                            public Unit invoke(List<? extends ProximityAttachment> proximityAttachments) {
+
+                                                return null;
+                                            }
+                                        })
+                                        .create();
+
+
+                        proximityObserverw12.addProximityZone(zone3);
+
+
+                        RequirementsWizardFactory
+                                .createEstimoteRequirementsWizard()
+                                .fulfillRequirements(MainActivity.this,
+                                        // onRequirementsFulfilled
+                                        new Function0<Unit>() {
+                                            @Override public Unit invoke() {
+                                                Log.d("app", "requirements fulfilled");
+                                                proximityHandlerw12 = proximityObserverw12.start();
+                                                return null;
+                                            }
+                                        },
+                                        // onRequirementsMissing
+                                        new Function1<List<? extends Requirement>, Unit>() {
+                                            @Override public Unit invoke(List<? extends Requirement> requirements) {
+                                                Log.e("app", "requirements missing: " + requirements);
+                                                return null;
+                                            }
+                                        },
+                                        // onError
+                                        new Function1<Throwable, Unit>() {
+                                            @Override public Unit invoke(Throwable throwable) {
+                                                Log.e("app", "requirements error: " + throwable);
+                                                return null;
+                                            }
+                                        });
+                    }
+                    else if(end.equals("w4"))
+                    {
+                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
+                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w4[0], w4[1], paint); // line to w4
+
+                        ProximityZone zone1 = proximityObserverw12.zoneBuilder()
+                                .forAttachmentKeyAndValue("floor", "8th")
+                                .inCustomRange(2.5)
+                                .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                    @Override
+                                    public Unit invoke(List<? extends ProximityAttachment> attachments) {
+                                        List<String> desks = new ArrayList<>();
+                                        for (ProximityAttachment attachment : attachments) {
+                                            desks.add(attachment.getPayload().get("location"));
+                                        }
+                                        Log.d("app", "Nearby location: " + desks);
+                                        int count = desks.size();
+                                        String data = "";
+                                        for (int i = 0; i < count; i++) {
+                                            data = data + desks.get(i) + ",";
+                                        }
+
+                                        //  tv.setText(data);
+                                        if(data.equals("woodworking entrance,"))
+                                        {
+                                            Toast.makeText(getApplicationContext(),"You are at woodworking entrance. Walk straight around 4 meters.",Toast.LENGTH_LONG).show();
+                                        }
+                                        if (data.equals("woodworking entrance,student lounge start,")  || data.equals("student lounge start,")) {
+                                            Toast.makeText(getApplicationContext(), "Take left and walk for around 7 meters", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        // Toast.makeText(getApplicationContext(),"devices"+desks,Toast.LENGTH_SHORT).show();
+                                        return null;
+                                    }
+                                })
+                                .create();
+                        proximityObserverw12.addProximityZone(zone1);
+
+
+
+                        ProximityZone zone3 =
+                                proximityObserverw12.zoneBuilder()
+                                        .forAttachmentKeyAndValue("location", "w12")
+                                        .inNearRange()
+                                        .withOnEnterAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                                                builder.setTitle("Destination Arrived");
+                                                builder.setMessage("You have reached your destination. It is on your left side");
+
+                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Intent i = new Intent(MainActivity.this,NavigationHome.class);
+                                                        startActivity(i);
+
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+
+
+
+                                                AlertDialog alert = builder.create();
+                                                alert.show();
+
+                                                //Toast.makeText(getApplicationContext(), "Your destination is on your right side", Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+                                                // Toast.makeText(getApplicationContext(),"bye to student lounge end",Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                            @Override
+                                            public Unit invoke(List<? extends ProximityAttachment> proximityAttachments) {
+
+                                                return null;
+                                            }
+                                        })
+                                        .create();
+
+
+                        proximityObserverw12.addProximityZone(zone3);
+
+
+                        RequirementsWizardFactory
+                                .createEstimoteRequirementsWizard()
+                                .fulfillRequirements(MainActivity.this,
+                                        // onRequirementsFulfilled
+                                        new Function0<Unit>() {
+                                            @Override public Unit invoke() {
+                                                Log.d("app", "requirements fulfilled");
+                                                proximityHandlerw12 = proximityObserverw12.start();
+                                                return null;
+                                            }
+                                        },
+                                        // onRequirementsMissing
+                                        new Function1<List<? extends Requirement>, Unit>() {
+                                            @Override public Unit invoke(List<? extends Requirement> requirements) {
+                                                Log.e("app", "requirements missing: " + requirements);
+                                                return null;
+                                            }
+                                        },
+                                        // onError
+                                        new Function1<Throwable, Unit>() {
+                                            @Override public Unit invoke(Throwable throwable) {
+                                                Log.e("app", "requirements error: " + throwable);
+                                                return null;
+                                            }
+                                        });
+                    }
+                    else if(end.equals("w5"))
+                    {
+                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
+                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w51[0], w51[1], paint); // line to w5
+
+                        ProximityZone zone1 = proximityObserverw12.zoneBuilder()
+                                .forAttachmentKeyAndValue("floor", "8th")
+                                .inCustomRange(2.5)
+                                .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                    @Override
+                                    public Unit invoke(List<? extends ProximityAttachment> attachments) {
+                                        List<String> desks = new ArrayList<>();
+                                        for (ProximityAttachment attachment : attachments) {
+                                            desks.add(attachment.getPayload().get("location"));
+                                        }
+                                        Log.d("app", "Nearby location: " + desks);
+                                        int count = desks.size();
+                                        String data = "";
+                                        for (int i = 0; i < count; i++) {
+                                            data = data + desks.get(i) + ",";
+                                        }
+
+                                        //  tv.setText(data);
+                                        if(data.equals("woodworking entrance,"))
+                                        {
+                                            Toast.makeText(getApplicationContext(),"You are at woodworking entrance. Walk straight around 4 meters.",Toast.LENGTH_LONG).show();
+                                        }
+                                        if (data.equals("woodworking entrance,student lounge start,")  || data.equals("student lounge start,")) {
+                                            Toast.makeText(getApplicationContext(), "Take left and walk for around 12 meters", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        // Toast.makeText(getApplicationContext(),"devices"+desks,Toast.LENGTH_SHORT).show();
+                                        return null;
+                                    }
+                                })
+                                .create();
+                        proximityObserverw12.addProximityZone(zone1);
+
+
+
+                        ProximityZone zone3 =
+                                proximityObserverw12.zoneBuilder()
+                                        .forAttachmentKeyAndValue("location", "w12")
+                                        .inNearRange()
+                                        .withOnEnterAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                                                builder.setTitle("Destination Arrived");
+                                                builder.setMessage("You have reached your destination. It is on your left side");
+
+                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Intent i = new Intent(MainActivity.this,NavigationHome.class);
+                                                        startActivity(i);
+
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+
+
+
+                                                AlertDialog alert = builder.create();
+                                                alert.show();
+
+                                                //Toast.makeText(getApplicationContext(), "Your destination is on your right side", Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+                                                // Toast.makeText(getApplicationContext(),"bye to student lounge end",Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                            @Override
+                                            public Unit invoke(List<? extends ProximityAttachment> proximityAttachments) {
+
+                                                return null;
+                                            }
+                                        })
+                                        .create();
+
+
+                        proximityObserverw12.addProximityZone(zone3);
+
+
+                        RequirementsWizardFactory
+                                .createEstimoteRequirementsWizard()
+                                .fulfillRequirements(MainActivity.this,
+                                        // onRequirementsFulfilled
+                                        new Function0<Unit>() {
+                                            @Override public Unit invoke() {
+                                                Log.d("app", "requirements fulfilled");
+                                                proximityHandlerw12 = proximityObserverw12.start();
+                                                return null;
+                                            }
+                                        },
+                                        // onRequirementsMissing
+                                        new Function1<List<? extends Requirement>, Unit>() {
+                                            @Override public Unit invoke(List<? extends Requirement> requirements) {
+                                                Log.e("app", "requirements missing: " + requirements);
+                                                return null;
+                                            }
+                                        },
+                                        // onError
+                                        new Function1<Throwable, Unit>() {
+                                            @Override public Unit invoke(Throwable throwable) {
+                                                Log.e("app", "requirements error: " + throwable);
+                                                return null;
+                                            }
+                                        });
+                    }
+                    else if(end.equals("w6"))
+                    {
+                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
+                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w6we[0], w6we[1], paint); // line to w6
+
+                        ProximityZone zone1 = proximityObserverw12.zoneBuilder()
+                                .forAttachmentKeyAndValue("floor", "8th")
+                                .inCustomRange(2.5)
+                                .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                    @Override
+                                    public Unit invoke(List<? extends ProximityAttachment> attachments) {
+                                        List<String> desks = new ArrayList<>();
+                                        for (ProximityAttachment attachment : attachments) {
+                                            desks.add(attachment.getPayload().get("location"));
+                                        }
+                                        Log.d("app", "Nearby location: " + desks);
+                                        int count = desks.size();
+                                        String data = "";
+                                        for (int i = 0; i < count; i++) {
+                                            data = data + desks.get(i) + ",";
+                                        }
+
+                                        //  tv.setText(data);
+                                        if(data.equals("woodworking entrance,"))
+                                        {
+                                            Toast.makeText(getApplicationContext(),"You are at woodworking entrance. Walk straight around 4 meters.",Toast.LENGTH_LONG).show();
+                                        }
+                                        if (data.equals("woodworking entrance,student lounge start,")  || data.equals("student lounge start,")) {
+                                            Toast.makeText(getApplicationContext(), "Take left and walk for around 17 meters", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        // Toast.makeText(getApplicationContext(),"devices"+desks,Toast.LENGTH_SHORT).show();
+                                        return null;
+                                    }
+                                })
+                                .create();
+                        proximityObserverw12.addProximityZone(zone1);
+
+
+
+                        ProximityZone zone3 =
+                                proximityObserverw12.zoneBuilder()
+                                        .forAttachmentKeyAndValue("location", "w12")
+                                        .inNearRange()
+                                        .withOnEnterAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                                                builder.setTitle("Destination Arrived");
+                                                builder.setMessage("You have reached your destination. It is on your right side");
+
+                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Intent i = new Intent(MainActivity.this,NavigationHome.class);
+                                                        startActivity(i);
+
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+
+
+
+                                                AlertDialog alert = builder.create();
+                                                alert.show();
+
+                                                //Toast.makeText(getApplicationContext(), "Your destination is on your right side", Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+                                                // Toast.makeText(getApplicationContext(),"bye to student lounge end",Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                            @Override
+                                            public Unit invoke(List<? extends ProximityAttachment> proximityAttachments) {
+
+                                                return null;
+                                            }
+                                        })
+                                        .create();
+
+
+                        proximityObserverw12.addProximityZone(zone3);
+
+
+                        RequirementsWizardFactory
+                                .createEstimoteRequirementsWizard()
+                                .fulfillRequirements(MainActivity.this,
+                                        // onRequirementsFulfilled
+                                        new Function0<Unit>() {
+                                            @Override public Unit invoke() {
+                                                Log.d("app", "requirements fulfilled");
+                                                proximityHandlerw12 = proximityObserverw12.start();
+                                                return null;
+                                            }
+                                        },
+                                        // onRequirementsMissing
+                                        new Function1<List<? extends Requirement>, Unit>() {
+                                            @Override public Unit invoke(List<? extends Requirement> requirements) {
+                                                Log.e("app", "requirements missing: " + requirements);
+                                                return null;
+                                            }
+                                        },
+                                        // onError
+                                        new Function1<Throwable, Unit>() {
+                                            @Override public Unit invoke(Throwable throwable) {
+                                                Log.e("app", "requirements error: " + throwable);
+                                                return null;
+                                            }
+                                        });
+                    }
+                    else if(end.equals("w7"))
+                    {
+                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
+                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w7we[0], w7we[1], paint); // line to w7
+
+                        ProximityZone zone1 = proximityObserverw12.zoneBuilder()
+                                .forAttachmentKeyAndValue("floor", "8th")
+                                .inCustomRange(2.5)
+                                .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                    @Override
+                                    public Unit invoke(List<? extends ProximityAttachment> attachments) {
+                                        List<String> desks = new ArrayList<>();
+                                        for (ProximityAttachment attachment : attachments) {
+                                            desks.add(attachment.getPayload().get("location"));
+                                        }
+                                        Log.d("app", "Nearby location: " + desks);
+                                        int count = desks.size();
+                                        String data = "";
+                                        for (int i = 0; i < count; i++) {
+                                            data = data + desks.get(i) + ",";
+                                        }
+
+                                        //  tv.setText(data);
+                                        if(data.equals("woodworking entrance,"))
+                                        {
+                                            Toast.makeText(getApplicationContext(),"You are at woodworking entrance. Walk straight around 4 meters.",Toast.LENGTH_LONG).show();
+                                        }
+                                        if (data.equals("woodworking entrance,student lounge start,")  || data.equals("student lounge start,")) {
+                                            Toast.makeText(getApplicationContext(), "Take left and walk for around 12 meters", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        // Toast.makeText(getApplicationContext(),"devices"+desks,Toast.LENGTH_SHORT).show();
+                                        return null;
+                                    }
+                                })
+                                .create();
+                        proximityObserverw12.addProximityZone(zone1);
+
+
+
+                        ProximityZone zone3 =
+                                proximityObserverw12.zoneBuilder()
+                                        .forAttachmentKeyAndValue("location", "w12")
+                                        .inNearRange()
+                                        .withOnEnterAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                                                builder.setTitle("Destination Arrived");
+                                                builder.setMessage("You have reached your destination. It is on your right side");
+
+                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Intent i = new Intent(MainActivity.this,NavigationHome.class);
+                                                        startActivity(i);
+
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+
+
+
+                                                AlertDialog alert = builder.create();
+                                                alert.show();
+
+                                                //Toast.makeText(getApplicationContext(), "Your destination is on your right side", Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+                                                // Toast.makeText(getApplicationContext(),"bye to student lounge end",Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                            @Override
+                                            public Unit invoke(List<? extends ProximityAttachment> proximityAttachments) {
+
+                                                return null;
+                                            }
+                                        })
+                                        .create();
+
+
+                        proximityObserverw12.addProximityZone(zone3);
+
+
+                        RequirementsWizardFactory
+                                .createEstimoteRequirementsWizard()
+                                .fulfillRequirements(MainActivity.this,
+                                        // onRequirementsFulfilled
+                                        new Function0<Unit>() {
+                                            @Override public Unit invoke() {
+                                                Log.d("app", "requirements fulfilled");
+                                                proximityHandlerw12 = proximityObserverw12.start();
+                                                return null;
+                                            }
+                                        },
+                                        // onRequirementsMissing
+                                        new Function1<List<? extends Requirement>, Unit>() {
+                                            @Override public Unit invoke(List<? extends Requirement> requirements) {
+                                                Log.e("app", "requirements missing: " + requirements);
+                                                return null;
+                                            }
+                                        },
+                                        // onError
+                                        new Function1<Throwable, Unit>() {
+                                            @Override public Unit invoke(Throwable throwable) {
+                                                Log.e("app", "requirements error: " + throwable);
+                                                return null;
+                                            }
+                                        });
+                    }
+                    else if(end.equals("w8"))
+                    {
+                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
+                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w81[0], w81[1], paint); // line to w8
+
+                        ProximityZone zone1 = proximityObserverw12.zoneBuilder()
+                                .forAttachmentKeyAndValue("floor", "8th")
+                                .inCustomRange(2.5)
+                                .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                    @Override
+                                    public Unit invoke(List<? extends ProximityAttachment> attachments) {
+                                        List<String> desks = new ArrayList<>();
+                                        for (ProximityAttachment attachment : attachments) {
+                                            desks.add(attachment.getPayload().get("location"));
+                                        }
+                                        Log.d("app", "Nearby location: " + desks);
+                                        int count = desks.size();
+                                        String data = "";
+                                        for (int i = 0; i < count; i++) {
+                                            data = data + desks.get(i) + ",";
+                                        }
+
+                                        //  tv.setText(data);
                                         if(data.equals("woodworking entrance,"))
                                         {
                                             Toast.makeText(getApplicationContext(),"You are at woodworking entrance. Walk straight around 4 meters.",Toast.LENGTH_LONG).show();
@@ -296,54 +1497,6 @@ public class MainActivity extends AppCompatActivity{
                                                 return null;
                                             }
                                         });
-                    }
-                    else if(end.equals("w2")) {
-                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
-                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w2[0], w2[1], paint); // line to w2
-                    }
-                    else if(end.equals("w3")) {
-                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
-                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w3[0], w3[1], paint); // line to w3
-                    }
-                    else if(end.equals("w9") || end.equals("w9/10"))
-                    {
-                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
-                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w9we[0], w9we[1], paint); // line to w9
-                    }
-                    else if(end.equals("w10"))
-                    {
-                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
-                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w10we[0], w10we[1], paint); // line to w10
-                    }
-                    else if(end.equals("w11"))
-                    {
-                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
-                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w11[0], w11[1], paint); // line to w11
-                    }
-                    else if(end.equals("w4"))
-                    {
-                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
-                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w4[0], w4[1], paint); // line to w4
-                    }
-                    else if(end.equals("w5"))
-                    {
-                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
-                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w51[0], w51[1], paint); // line to w5
-                    }
-                    else if(end.equals("w6"))
-                    {
-                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
-                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w6we[0], w6we[1], paint); // line to w6
-                    }
-                    else if(end.equals("w7"))
-                    {
-                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
-                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w7we[0], w7we[1], paint); // line to w7
-                    }
-                    else if(end.equals("w8"))
-                    {
-                        canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], studentloungeStart[0],studentloungeStart[1], paint); // line to studentlounge start
-                        canvas.drawLine(studentloungeStart[0], studentloungeStart[1], w81[0], w81[1], paint); // line to w8
                     }
                     else if(end.equals("w12"))
                     {
@@ -499,6 +1652,148 @@ public class MainActivity extends AppCompatActivity{
                     {
                         canvas.drawLine(woodworkingEnterance[0], woodworkingEnterance[1], stdentloungeEnd[0],stdentloungeEnd[1], paint); // line to studentlounge end
                         canvas.drawLine(stdentloungeEnd[0], stdentloungeEnd[1], w13[0], w13[1], paint); // line to w13
+
+                        ProximityZone zone1 = proximityObserverw12.zoneBuilder()
+                                .forAttachmentKeyAndValue("floor", "8th")
+                                .inCustomRange(2.5)
+                                .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                    @Override
+                                    public Unit invoke(List<? extends ProximityAttachment> attachments) {
+                                        List<String> desks = new ArrayList<>();
+                                        for (ProximityAttachment attachment : attachments) {
+                                            desks.add(attachment.getPayload().get("location"));
+                                        }
+                                        Log.d("app", "Nearby location: " + desks);
+                                        int count = desks.size();
+                                        String data = "";
+                                        for (int i = 0; i < count; i++) {
+                                            data = data + desks.get(i) + ",";
+                                        }
+
+                                        // tv.setText(data);
+                                        if(data.equals("woodworking entrance,"))
+                                        {
+                                            Toast.makeText(getApplicationContext(),"You are at woodworking entrance. Walk straight around 18 meters.",Toast.LENGTH_LONG).show();
+                                        }
+                                        if (data.equals("student lounge start,student lounge mid,") || data.equals("student lounge start,")) {
+                                            Toast.makeText(getApplicationContext(), "You are passing through student lounge", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        // Toast.makeText(getApplicationContext(),"devices"+desks,Toast.LENGTH_SHORT).show();
+                                        return null;
+                                    }
+                                })
+                                .create();
+                        proximityObserverw12.addProximityZone(zone1);
+
+
+
+                        ProximityZone zone2 =
+                                proximityObserverw12.zoneBuilder()
+                                        .forAttachmentKeyAndValue("location", "student lounge end")
+                                        .inNearRange()
+                                        .withOnEnterAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+                                                Toast.makeText(getApplicationContext(), "Take right and walk straight for around 17 meters ", Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+                                                //Toast.makeText(getApplicationContext(),"bye to student lounge mid",Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                            @Override
+                                            public Unit invoke(List<? extends ProximityAttachment> proximityAttachments) {
+
+                                                return null;
+                                            }
+                                        })
+                                        .create();
+
+
+                        proximityObserverw12.addProximityZone(zone2);
+
+                        ProximityZone zone3 =
+                                proximityObserverw12.zoneBuilder()
+                                        .forAttachmentKeyAndValue("location", "w12")
+                                        .inNearRange()
+                                        .withOnEnterAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                                                builder.setTitle("Destination Arrived");
+                                                builder.setMessage("You have reached your destination. It is on your left side");
+
+                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        Intent i = new Intent(MainActivity.this,NavigationHome.class);
+                                                        startActivity(i);
+
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+
+
+
+                                                AlertDialog alert = builder.create();
+                                                alert.show();
+                                                //Toast.makeText(getApplicationContext(), "Your destination is on your right side", Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnExitAction(new Function1<ProximityAttachment, Unit>() {
+                                            @Override
+                                            public Unit invoke(ProximityAttachment proximityAttachment) {
+                                                // Toast.makeText(getApplicationContext(),"bye to student lounge end",Toast.LENGTH_LONG).show();
+                                                return null;
+                                            }
+                                        })
+                                        .withOnChangeAction(new Function1<List<? extends ProximityAttachment>, Unit>() {
+                                            @Override
+                                            public Unit invoke(List<? extends ProximityAttachment> proximityAttachments) {
+
+                                                return null;
+                                            }
+                                        })
+                                        .create();
+
+
+                        proximityObserverw12.addProximityZone(zone3);
+
+
+                        RequirementsWizardFactory
+                                .createEstimoteRequirementsWizard()
+                                .fulfillRequirements(MainActivity.this,
+                                        // onRequirementsFulfilled
+                                        new Function0<Unit>() {
+                                            @Override public Unit invoke() {
+                                                Log.d("app", "requirements fulfilled");
+                                                proximityHandlerw12 = proximityObserverw12.start();
+                                                return null;
+                                            }
+                                        },
+                                        // onRequirementsMissing
+                                        new Function1<List<? extends Requirement>, Unit>() {
+                                            @Override public Unit invoke(List<? extends Requirement> requirements) {
+                                                Log.e("app", "requirements missing: " + requirements);
+                                                return null;
+                                            }
+                                        },
+                                        // onError
+                                        new Function1<Throwable, Unit>() {
+                                            @Override public Unit invoke(Throwable throwable) {
+                                                Log.e("app", "requirements error: " + throwable);
+                                                return null;
+                                            }
+                                        });
                     }
 
                 }
